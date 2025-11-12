@@ -36,3 +36,5 @@ end_time = time.time()
 print(f"Processed {len(results)} images in {end_time - start_time:.2f} seconds")
 print(f"total pixels in main script = {ray.get(counter.get_total.remote())}")
 ray.shutdown()
+
+# fault tolerance , checkpointing
