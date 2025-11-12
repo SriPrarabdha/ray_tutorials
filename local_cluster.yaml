@@ -1,0 +1,40 @@
+# ray-local-cluster.yaml
+# A simple config for manually managed on-prem / LAN nodes
+
+cluster_name: my-lab-ray-cluster
+
+# Local provider (no cloud)
+provider:
+    type: local
+    head_ip: 192.168.1.10          # IP of your head node on LAN
+    worker_ips:
+        - 192.168.1.11
+        - 192.168.1.12
+        - 192.168.1.13
+        - 192.168.1.14
+
+# Describe the head node
+head_node_type:
+    name: head_node
+    resources: {"CPU": 4}
+
+# Describe the worker nodes
+worker_node_types:
+    - name: worker_nodes
+      resources: {"CPU": 8, "GPU": 1}   # Adjust if you have GPUs
+      min_workers: 4
+      max_workers: 4
+
+# Setup commands for local nodes
+setup_commands:
+    - sudo apt update && sudo apt install -y python3-pip
+    - pip install -U ray
+
+# Start Ray commands
+head_start_ray_commands:
+    - ray stop
+    - ray start --head --port=6379 --dashboard-host=0.0.0.0
+
+worker_start_ray_commands:
+    - ray stop
+    - ray start --address=192.168.1.10:6379

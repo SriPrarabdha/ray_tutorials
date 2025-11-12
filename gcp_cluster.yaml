@@ -1,0 +1,56 @@
+# ray-gcp-cluster.yaml
+# A unique name for your Ray cluster
+cluster_name: my-image-processing-cluster
+
+# Cloud provider: GCP
+provider:
+    type: gcp
+    region: us-central1
+    availability_zone: us-central1-a
+    project_id: your-gcp-project-id
+
+# Credentials (optional if using default gcloud setup)
+# If needed, specify service account key path:
+# gcp_credentials: ~/.config/gcloud/application_default_credentials.json
+
+# Describe the head node (the manager)
+head_node_type:
+    name: head_node
+    machineType: n1-standard-4        # ~ similar to m5.large
+    disks:
+        - boot: true
+          autoDelete: true
+          initializeParams:
+              diskSizeGb: 100
+              sourceImage: projects/debian-cloud/global/images/family/debian-11
+    labels:
+        role: head
+
+# Describe the worker nodes (the muscle)
+worker_node_types:
+    - name: worker_nodes
+      machineType: n1-standard-8       # ~ similar to c5.2xlarge
+      min_workers: 10
+      max_workers: 10
+      disks:
+          - boot: true
+            autoDelete: true
+            initializeParams:
+                diskSizeGb: 100
+                sourceImage: projects/debian-cloud/global/images/family/debian-11
+      labels:
+          role: worker
+
+# Docker image / setup commands (optional)
+setup_commands:
+    - sudo apt update && sudo apt install -y python3-pip
+    - pip install -U ray
+
+# Ray startup commands
+head_start_ray_commands:
+    - ray stop
+    - ray start --head --port=6379
+
+worker_start_ray_commands:
+    - ray stop
+    - ray start --address=$RAY_HEAD_IP:6379
