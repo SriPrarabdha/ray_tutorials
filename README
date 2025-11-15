@@ -1,7 +1,6 @@
----
-** A practical workshop on scaling ML workflows with the Ray ecosystem**
 
----
+# A practical workshop on scaling ML workflows with the Ray ecosystem
+
 
 ## 🚀 Overview
 
@@ -18,7 +17,6 @@ Each folder contains:
 If you are new to Ray, this repo will help you understand not just APIs —
 but *how Ray changes the way ML engineers build systems*.
 
----
 
 # 📚 What You’ll Learn
 
