@@ -7,9 +7,11 @@ ray.init()
 @ray.remote
 class PixelCounter:
     def __init__ (self):
+        # This is the actor's private, internal state
         self.total_pixels = 0
 
     def add (self, num_pixels: int):
+        # This method will update the actors's state
         self.total_pixels += num_pixels
 
     def get_total(self) -> int:
@@ -25,6 +27,7 @@ def process_images(image: np.ndarray , counter_actor: "ActorHandle") -> np.ndarr
 images = [np.random.randint(0, 255, (10, 10, 3)) for _ in range(8)]
 image_size = images[0].size
 
+#This create the actor and returns a handle to it
 counter = PixelCounter.remote()
 
 start_time = time.time()
