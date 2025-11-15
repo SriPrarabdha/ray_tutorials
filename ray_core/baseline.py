@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import argparse
+import asyncio
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from multiprocessing import Pool
 import threading
@@ -69,6 +70,27 @@ def manual_threading(images, workers=4):
     end_time = time.time()
     return results, end_time - start_time
 
+async def async_process_image(image: np.ndarray, executor: ThreadPoolExecutor) -> np.ndarray:
+    """Async wrapper for image processing"""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(executor, process_images, image)
+
+async def async_processing_impl(images, workers=4):
+    """Async implementation"""
+    executor = ThreadPoolExecutor(max_workers=workers)
+    tasks = [async_process_image(img, executor) for img in images]
+    results = await asyncio.gather(*tasks)
+    executor.shutdown(wait=True)
+    return results
+
+def async_processing(images, workers=4):
+    """Method 6: Async with asyncio"""
+    print(f"Using Async Processing with {workers} workers...")
+    start_time = time.time()
+    results = asyncio.run(async_processing_impl(images, workers))
+    end_time = time.time()
+    return results, end_time - start_time
+
 def run_all_methods(images, workers=4):
     """Run all methods and compare"""
     print("=" * 60)
@@ -80,7 +102,8 @@ def run_all_methods(images, workers=4):
         'threadpool': lambda: threadpool_processing(images, workers),
         'processpool': lambda: processpool_processing(images, workers),
         'multiprocessing': lambda: multiprocessing_pool(images, workers),
-        'threading': lambda: manual_threading(images, workers)
+        'threading': lambda: manual_threading(images, workers),
+        'async': lambda: async_processing(images, workers)
     }
     
     timings = {}
@@ -107,6 +130,7 @@ def main():
 Examples:
   python script.py --method sequential
   python script.py --method threadpool --workers 8
+  python script.py --method async --workers 8
   python script.py --method all --images 16
   python script.py -m processpool -w 4 -n 12
         '''
@@ -115,7 +139,7 @@ Examples:
     parser.add_argument(
         '-m', '--method',
         type=str,
-        choices=['sequential', 'threadpool', 'processpool', 'multiprocessing', 'threading', 'all'],
+        choices=['sequential', 'threadpool', 'processpool', 'multiprocessing', 'threading', 'async', 'all'],
         default='threadpool',
         help='Parallelization method to use (default: threadpool)'
     )
@@ -123,7 +147,7 @@ Examples:
     parser.add_argument(
         '-w', '--workers',
         type=int,
-        default=4,
+        default=6,
         help='Number of workers/threads/processes (default: 4)'
     )
     
@@ -158,6 +182,7 @@ Examples:
         'processpool': lambda: processpool_processing(images, args.workers),
         'multiprocessing': lambda: multiprocessing_pool(images, args.workers),
         'threading': lambda: manual_threading(images, args.workers),
+        'async': lambda: async_processing(images, args.workers),
         'all': lambda: run_all_methods(images, args.workers)
     }
     
