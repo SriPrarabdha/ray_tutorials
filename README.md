@@ -130,8 +130,8 @@ Feel free to open issues or PRs if you have improvements, bug fixes, or new exam
 
 ---
 
-# ⭐ Acknowledgments
+<!-- # ⭐ Acknowledgments
 
-This workshop and repo were created as part of a technical session at **UbuCon India 2025**, showing how open-source AI infrastructure enables even small teams to operate like large ML organizations.
+This workshop and repo were created as part of a technical session at **UbuCon India 2025**, showing how open-source AI infrastructure enables even small teams to operate like large ML organizations. -->
 
 ---
